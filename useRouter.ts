@@ -63,11 +63,12 @@ export interface PageRouter<P extends Record<string, string | undefined>> {
  * import { render } from "@testing-library/react"
  * import { userEvent } from "@testing-library/user-event"
  * 
- * export default function View() {
+ * export default function HomeView() {
  *     const router = useRouter()
  * 
  *     return (
  *         <div>
+ *             <h1>Welcome Home</h1>
  *             <button onClick={() => router.push("/profile")}>My Profile</button>
  *         </div>
  *     )

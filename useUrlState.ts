@@ -15,14 +15,16 @@ import qs from "qs"
  * import { render } from "@testing-library/react"
  * import { userEvent } from "@testing-library/user-event"
  * 
- * export default function View() {
+ * export default function ProfileView() {
  *     const [state, setState] = useUrlState({ name: "Alice", age: 18 })
  * 
  *     return (
  *         <div>
  *             <h1>Name: {state.name}</h1>
  *             <p>Age: {state.age}</p>
- *             <button onClick={() => setState({ name: "Bob", age: 20 })}>Change Name</button>
+ *             <button onClick={() => setState({ name: "Bob", age: 20 })}>
+ *                 Change Profile
+ *             </button>
  *         </div>
  *     )
  * }

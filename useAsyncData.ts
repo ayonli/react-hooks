@@ -14,7 +14,6 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "reac
  * @example
  * ```tsx
  * import useAsyncData from "./useAsyncData.ts"
- * import { render, waitFor } from "@testing-library/react"
  *
  * export function UserComponent() {
  *     const { loading, data, error } = useAsyncData(async signal => {
@@ -41,7 +40,7 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "reac
  *
  *     return (
  *         <div role="user-panel">
- *             {error ? <div>Error: {error.message}</div> : null}
+ *             {error ? <div>Error: {(error as Error).message}</div> : null}
  *             {data && (
  *                 <div>
  *                     <h1>Name: {data.name}</h1>
@@ -51,16 +50,9 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "reac
  *         </div>
  *     )
  * }
- * 
- * const dom = render(<UserComponent />)
- * dom.debug()
- * console.log("\n")
- * 
- * await waitFor(() => dom.getByRole("user-panel"))
- * dom.debug()
  * ```
  */
-export function useAsyncData<T, D extends unknown[] = [], E extends unknown = unknown>(
+export default function useAsyncData<T, D extends unknown[] = [], E extends unknown = unknown>(
     fn: (signal: AbortSignal, deps: D, setData: Dispatch<SetStateAction<T>>) => Promise<T>,
     deps: D = [] as unknown as D,
     shouldRequest: ((...deps: D) => boolean) | undefined = undefined
