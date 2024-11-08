@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest"
 import { afterEach, beforeAll } from "vitest"
 import { cleanup } from "@testing-library/react"
-import { setup } from "./testing/util.tsx"
+import { setup } from "./testing.tsx"
 
 beforeAll(() => {
     setup([

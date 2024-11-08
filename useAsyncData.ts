@@ -13,11 +13,11 @@ import { SetStateAction, useCallback, useEffect, useState } from "react"
  *
  * @example
  * ```tsx
- * import useRequest from "./useRequest.ts"
+ * import useAsyncData from "./useAsyncData.ts"
  * import { render, waitFor } from "@testing-library/react"
  *
  * export function UserComponent() {
- *     const { data, loading, error } = useRequest(async signal => {
+ *     const { data, loading, error } = useAsyncData(async signal => {
  *         const res = await fetch("/api/users/me", { signal })
  *         const result = await res.json() as {
  *             success: boolean
@@ -60,7 +60,7 @@ import { SetStateAction, useCallback, useEffect, useState } from "react"
  * dom.debug()
  * ```
  */
-export function useRequest<T, D extends unknown[] = [], E extends Error = Error>(
+export function useAsyncData<T, D extends unknown[] = [], E extends Error = Error>(
     fn: (signal: AbortSignal, deps: D, set: (data: SetStateAction<T>) => void) => Promise<T>,
     deps: D = [] as any,
     shouldRequest: ((...deps: D) => boolean) | undefined = undefined
