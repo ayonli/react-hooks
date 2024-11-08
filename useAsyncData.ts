@@ -17,7 +17,7 @@ import { SetStateAction, useCallback, useEffect, useState } from "react"
  * import { render, waitFor } from "@testing-library/react"
  *
  * export function UserComponent() {
- *     const { data, loading, error } = useAsyncData(async signal => {
+ *     const { loading, data, error } = useAsyncData(async signal => {
  *         const res = await fetch("/api/users/me", { signal })
  *         const result = await res.json() as {
  *             success: boolean
@@ -60,16 +60,22 @@ import { SetStateAction, useCallback, useEffect, useState } from "react"
  * dom.debug()
  * ```
  */
-export function useAsyncData<T, D extends unknown[] = [], E extends Error = Error>(
+export function useAsyncData<T, D extends unknown[] = [], E extends unknown = unknown>(
     fn: (signal: AbortSignal, deps: D, set: (data: SetStateAction<T>) => void) => Promise<T>,
     deps: D = [] as any,
     shouldRequest: ((...deps: D) => boolean) | undefined = undefined
-) {
+): {
+    loading: boolean
+    data: T | undefined
+    error: E | undefined
+    abort: (reason?: E) => void
+    set: (data: SetStateAction<T>) => void
+} {
     const [state, setState] = useState({
         loading: false,
-        abort: (reason: E | undefined = undefined) => void reason as void,
         data: undefined as T | undefined,
         error: undefined as E | undefined,
+        abort: (reason: E | undefined = undefined) => void reason as void,
     })
     const set = useCallback((data: SetStateAction<T>) => setState(state => {
         if (typeof data === "function") {

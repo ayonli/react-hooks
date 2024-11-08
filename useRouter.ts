@@ -1,18 +1,28 @@
 import { useState } from "react"
 import { NavigateOptions, To, useNavigate, useParams } from "react-router"
 
-export interface PageRouter {
+export type PushOptions = Omit<NavigateOptions, "replace">
+
+export type ReplaceOptions = Omit<NavigateOptions, "replace"> & {
+    /**
+     * Replace the URL but do not trigger page reload. This option is only
+     * available with history-based routing.
+     */
+    silent?: boolean
+}
+
+export interface PageRouter<P extends Record<string, string | undefined>> {
     /**
      * The parameters of the current route.
      */
-    params: Record<string, string>
+    params: Readonly<P>
     /**
      * Goes to the specified path and pushes the path to the history stack.
      * 
      * This function automatically handles relative paths and absolute paths,
      * when the path is a cross-origin URL, it will open the URL in a new tab.
      */
-    push: (to: To | URLSearchParams, options?: NavigateOptions) => void
+    push: (to: string | URL | URLSearchParams, options?: PushOptions) => void
     /**
      * Goes to the specified path and replaces the path in the same place of the
      * history stack.
@@ -20,12 +30,7 @@ export interface PageRouter {
      * This function automatically handles relative paths and absolute paths,
      * when the path is a cross-origin URL, it will open the URL in the same tab.
      */
-    replace: (to: To | URLSearchParams, options?: Omit<NavigateOptions, "replace"> & {
-        /**
-         * Replace the URL but do not trigger page reload.
-         */
-        silent?: boolean
-    }) => void
+    replace: (to: string | URL | URLSearchParams, options?: ReplaceOptions) => void
     /**
      * Goes to the specified number of pages in the history stack.
      */
@@ -78,76 +83,77 @@ export interface PageRouter {
  * console.log(location.pathname) // "/profile"
  * ```
  */
-export default function useRouter(): PageRouter {
-    const params = useParams()
+export default function useRouter<P extends Record<string, string | undefined>>(): PageRouter<P> {
+    const params = useParams() as Readonly<P>
     const _push = useNavigate()
     const [router] = useState(() => {
-        const push = (to: To | URLSearchParams, options: NavigateOptions = {}) => {
-            if (typeof to === "object") {
-                if (to instanceof URLSearchParams) {
-                    const query = to.toString()
-
-                    if (query) {
-                        return _push(location.pathname + "?" + query + location.hash)
-                    } else {
-                        return _push(location.pathname + location.hash)
-                    }
+        const push = (to: To | URL | URLSearchParams, options: NavigateOptions = {}) => {
+            if (typeof to === "string") {
+                if (to.startsWith("?")) {
+                    to = new URLSearchParams(to)
                 } else {
-                    return _push(to, options)
+                    to = new URL(to, location.origin)
                 }
             }
 
-            const { origin, pathname, search, hash, href } = new URL(to, location.origin)
+            if (to instanceof URL) {
+                const { origin, pathname, search, hash, href } = to
 
-            if (origin === location.origin && !pathname.startsWith("/api/")) {
-                return _push({ pathname, search, hash }, options)
-            } else if (options.replace) {
-                location.href = href
+                if (origin === location.origin) {
+                    return _push({ pathname, search, hash }, options)
+                } else if (options.replace) {
+                    location.href = href
+                } else {
+                    window.open(href, "_blank")
+                }
+            } else if (to instanceof URLSearchParams) {
+                const query = to.toString()
+
+                if (query) {
+                    return _push(location.pathname + "?" + query + location.hash)
+                } else {
+                    return _push(location.pathname + location.hash)
+                }
             } else {
-                window.open(href, "_blank")
+                return _push(to, options)
             }
         }
 
-        const replace = (to: To | URLSearchParams, options: Omit<NavigateOptions, "replace"> & {
-            /**
-             * Replace the URL but do not trigger page reload.
-             */
-            silent?: boolean
-        } = {}) => {
+        const replace = (to: To | URL | URLSearchParams, options: ReplaceOptions = {}) => {
             const { silent = false, ...rest } = options
 
-            if (silent) {
-                if (typeof to === "object") {
-                    let path: string | undefined
-
-                    if (to instanceof URLSearchParams) {
-                        const query = to.toString()
-
-                        if (query) {
-                            path = location.pathname + "?" + query + location.hash
-                        } else {
-                            path = location.pathname + location.hash
-                        }
-                    } else {
-                        path = (to.pathname ?? "/") + (to.search ?? "") + (to.hash ?? "")
-                    }
-
-                    window.history.replaceState(null, "", path)
-                    return
+            if (typeof to === "string") {
+                if (to.startsWith("?")) {
+                    to = new URLSearchParams(to)
                 } else {
-                    const { origin, href } = new URL(to, location.origin)
-
-                    if (origin === location.origin) {
-                        window.history.replaceState(null, "", href)
-                        return
-                    }
+                    to = new URL(to, location.origin)
                 }
             }
 
-            return push(to, {
-                ...rest,
-                replace: true,
-            })
+            if (!silent) {
+                push(to, {
+                    ...rest,
+                    replace: true,
+                })
+            } else {
+                let path: string | undefined
+
+                if (to instanceof URL) {
+                    path = to.href
+                } else if (to instanceof URLSearchParams) {
+                    const query = to.toString()
+
+                    if (query) {
+                        path = location.pathname + "?" + query + location.hash
+                    } else {
+                        path = location.pathname + location.hash
+                    }
+                } else {
+                    path = (to.pathname ?? "/") + (to.search ?? "") + (to.hash ?? "")
+                }
+
+                window.history.replaceState(null, "", path)
+            }
         }
 
         return {
@@ -161,11 +167,11 @@ export default function useRouter(): PageRouter {
                 if (fullPage) {
                     location.reload()
                 } else {
-                    replace(location.href)
+                    replace(location)
                 }
             }
-        }
+        } satisfies PageRouter<P>
     })
 
-    return router as PageRouter
+    return router as PageRouter<P>
 }

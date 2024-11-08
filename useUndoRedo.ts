@@ -1,8 +1,9 @@
 import { useCallback, useRef, useState } from "react"
 
 /**
- * This hook returns a `state` and functions to `setState`, `undo`, `redo`, and
- * `clear` the state.
+ * This hook returns an object containing a `state` and a `setState` functions,
+ * along with an `undo`, `redo`, and `clear` function to manage undo and redo
+ * functionality for the state.
  */
 export function useUndoRedo<T>(initial: T): {
     state: T

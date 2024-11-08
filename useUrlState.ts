@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react"
 import { isPlainObject, omit } from "@ayonli/jsext/object"
 import qs from "qs"
-import useRouter from "./useRouter.ts"
 
 /**
- * Similar to `React.useState()`, but will persist the state to the URL query
+ * Similar to `React.useState()`, but persist the state to the URL query
  * parameters so that the state can be restored after refreshing the page.
  * 
  * NOTE: This hook only works with history-based routing, it does not work with
@@ -43,8 +42,7 @@ import useRouter from "./useRouter.ts"
 export default function useUrlState<T extends {
     [x: string]: any
     "#"?: string
-}>(initials: T | (() => T)) {
-    const router = useRouter()
+}>(initials: T | (() => T)): readonly [T, Dispatch<SetStateAction<T>>] {
     const [search, setSearch] = useState(location.search)
     const [state, _setState] = useState(() => {
         let state: T
@@ -75,10 +73,10 @@ export default function useUrlState<T extends {
             path += "#" + newState["#"]
         }
 
-        router.replace(path, { silent: true })
+        window.history.replaceState(null, "", path)
         _setState(newState)
         setSearch(search)
-    }), [_setState, router, state])
+    }), [_setState, state])
 
     useEffect(() => {
         if (Object.keys(state).length !== 0) {
@@ -90,7 +88,7 @@ export default function useUrlState<T extends {
                 path += "#" + state["#"]
             }
 
-            router.replace(path, { silent: true })
+            window.history.replaceState(null, "", path)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])

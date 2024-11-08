@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 /**
  * Uses a prop as the state in a component, and when the prop changes,
@@ -20,7 +20,7 @@ import { useEffect, useState } from "react"
  * }
  * ```
  */
-export default function usePropState<T>(initial: T) {
+export default function usePropState<T>(initial: T): readonly [T, Dispatch<SetStateAction<T>>] {
     const [state, setState] = useState(initial)
 
     useEffect(() => {

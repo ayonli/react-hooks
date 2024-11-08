@@ -22,7 +22,7 @@ import { useCallback, useState } from "react"
  * }
  * ```
  */
-export function useRerender(): [rerender: () => void, counter: number] {
+export function useRerender(): readonly [rerender: () => void, counter: number] {
     const [n, set] = useState(1)
     const rerender = useCallback(() => set(n => n + 1), [set])
     return [rerender, n] as const
