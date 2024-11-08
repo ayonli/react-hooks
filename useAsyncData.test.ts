@@ -88,7 +88,7 @@ describe("useAsyncData", () => {
 
         await waitFor(() => expect(result.current.loading).toBe(false))
 
-        act(() => result.current.set("bar"))
+        act(() => result.current.setData("bar"))
         expect(result.current.loading).toBe(false)
         expect(result.current.data).toBe("bar")
         expect(result.current.error).toBe(undefined)

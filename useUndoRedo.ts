@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react"
 
 /**
  * This hook returns an object containing a `state` and a `setState` functions,
@@ -7,7 +7,7 @@ import { useCallback, useRef, useState } from "react"
  */
 export function useUndoRedo<T>(initial: T): {
     state: T
-    setState: React.Dispatch<React.SetStateAction<T>>
+    setState: Dispatch<SetStateAction<T>>
     undo: () => void
     redo: () => void
     clear: () => void
