@@ -52,7 +52,8 @@ describe("useAsyncData", () => {
         act(() => req.current.abort())
         await waitFor(() => expect(req.current.loading).toBe(false))
         expect(req.current.data).toBe(undefined)
-        expect(as(req.current.error, Error)?.message).includes("The operation was aborted.")
+        expect(typeof req.current.error).toBe("object")
+        expect(String(req.current.error)).includes("The operation was aborted.")
     })
 
     test("abort with reason", async () => {

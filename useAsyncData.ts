@@ -97,9 +97,6 @@ export default function useAsyncData<T, D extends unknown[] = [], E extends unkn
         })
 
         fn(signal, deps, setData).then(data => {
-            if (signal.aborted)
-                return
-
             setState(state => ({
                 ...state,
                 loading: false,
@@ -107,19 +104,11 @@ export default function useAsyncData<T, D extends unknown[] = [], E extends unkn
                 error: undefined,
             }))
         }).catch(err => {
-            let error: E
-
-            if (err instanceof Error) {
-                error = err as E
-            } else {
-                error = new Error(String(err)) as E
-            }
-
             setState(state => ({
                 ...state,
                 loading: false,
                 data: undefined,
-                error,
+                error: err as E,
             }))
         })
 
