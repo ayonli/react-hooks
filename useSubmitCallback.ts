@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
  * 
  * @example
  * ```tsx
- * import useSubmitter from "./useSubmitter.ts"
+ * import useSubmitCallback from "./useSubmitCallback.ts"
  * 
  * export default function MyForm() {
  *     const {
@@ -19,7 +19,7 @@ import { useEffect, useState } from "react"
  *         pending,
  *         result,
  *         error,
- *     } = useSubmitter(async (signal, data: FormData) => {
+ *     } = useSubmitCallback(async (signal, data: FormData) => {
  *         const res = await fetch("/api/submit", {
  *             method: "POST",
  *             body: data,
@@ -43,7 +43,7 @@ import { useEffect, useState } from "react"
  * }
  * ```
  */
-export default function useSubmitter<T, R, E extends unknown = unknown>(
+export default function useSubmitCallback<T, R, E extends unknown = unknown>(
     fn: (signal: AbortSignal, data: T) => Promise<R>
 ): {
     submit: (data: T) => void
