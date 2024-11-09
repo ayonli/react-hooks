@@ -43,12 +43,11 @@ export enum SubmitState {
  *     }
  * 
  *     return (
- *         <form onSubmit={e => {
- *            e.preventDefault()
- *            submit(new FormData(e.target))
- *         }}>
+ *         <form action={submit}>
  *             <input type="text" name="name" disabled={state === 1} />
- *             <button type="submit" disabled={state === 1}>Submit</button>
+ *             <button type="submit" disabled={state === 1}>
+ *                 {state === 1 ? "Submitting..." : "Submit"}
+ *             </button>
  *         </form>
  *     )
  * }
