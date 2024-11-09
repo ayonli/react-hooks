@@ -12,16 +12,93 @@ describe("useUrlState", () => {
     })
 
     test("object as initials", () => {
-        const { result } = renderHook(() => useUrlState({ foo: "bar" }))
+        const { result } = renderHook(() => useUrlState({
+            foo: "bar",
+            num: 123,
+            bool: true as boolean,
+            nil: null,
+            obj: {
+                hello: "world",
+            }
+        }))
         let [state, setState] = result.current
 
-        expect(state).toStrictEqual({ foo: "bar" })
-        expect(location.search).toBe("?foo=bar")
+        expect(state).toStrictEqual({
+            foo: "bar",
+            num: 123,
+            bool: true,
+            nil: null,
+            obj: {
+                hello: "world",
+            },
+        })
+        expect(location.search).toBe("?foo=bar&num=123&bool=true&nil&obj.hello=world")
 
-        act(() => setState({ foo: "baz" }));
+        act(() => setState({
+            foo: "baz",
+            num: 456,
+            bool: false,
+            nil: null,
+            obj: {
+                hello: "ayonli",
+            },
+        }));
         [state, setState] = result.current
-        expect(state).toStrictEqual({ foo: "baz" })
-        expect(location.search).toBe("?foo=baz")
+        expect(state).toStrictEqual({
+            foo: "baz",
+            num: 456,
+            bool: false,
+            nil: null,
+            obj: {
+                hello: "ayonli",
+            },
+        })
+        expect(location.search).toBe("?foo=baz&num=456&bool=false&nil&obj.hello=ayonli")
+    })
+
+    test("object as initials (no coerce)", () => {
+        const { result } = renderHook(() => useUrlState({
+            foo: "bar",
+            num: "123",
+            bool: "true",
+            nil: "null",
+            obj: {
+                hello: "world",
+            },
+        }, { noCoerce: true }))
+        let [state, setState] = result.current
+
+        expect(state).toStrictEqual({
+            foo: "bar",
+            num: "123",
+            bool: "true",
+            nil: "null",
+            obj: {
+                hello: "world",
+            },
+        })
+        expect(location.search).toBe("?foo=bar&num=123&bool=true&nil=null&obj.hello=world")
+
+        act(() => setState({
+            foo: "baz",
+            num: "456",
+            bool: "false",
+            nil: "null",
+            obj: {
+                hello: "ayonli",
+            },
+        }));
+        [state, setState] = result.current
+        expect(state).toStrictEqual({
+            foo: "baz",
+            num: "456",
+            bool: "false",
+            nil: "null",
+            obj: {
+                hello: "ayonli",
+            },
+        })
+        expect(location.search).toBe("?foo=baz&num=456&bool=false&nil=null&obj.hello=ayonli")
     })
 
     test("callback as initials", () => {

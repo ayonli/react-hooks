@@ -1,7 +1,13 @@
 // @deno-types="npm:@types/react@18"
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
 import { isPlainObject, omit } from "@ayonli/jsext/object"
+// @deno-types="npm:@types/qs@6"
 import qs from "qs"
+
+export type Scalar = string | number | boolean | null
+export type QueryValue<T extends Scalar = Scalar> = T | QueryObject<T> | QueryArray<T>
+export type QueryObject<T extends Scalar = Scalar> = Record<string, T>
+export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
 
 /**
  * Similar to `useState`, but persist the state to the URL query parameters so
@@ -9,6 +15,12 @@ import qs from "qs"
  * 
  * NOTE: This hook only works with history-based routing, it does not work with
  * hash-based routing.
+ * 
+ * NOTE: This hook automatically coerces the query parameters to the closest
+ * JavaScript type, for example, `"true"` and `"false"` will be converted to
+ * boolean, `"null"` will be converted to `null`, and numeric strings will be
+ * converted to numbers. To disable this behavior, set the `noCoerce` option to
+ * `true`.
  * 
  * @example
  * ```tsx
@@ -42,17 +54,29 @@ import qs from "qs"
  * dom.debug()
  * ```
  */
-export default function useUrlState<T extends {
-    [x: string]: unknown
+function useUrlState<T extends {
+    [x: string]: QueryValue | undefined
     "#"?: string
-}>(initials: T | (() => T)): readonly [T, Dispatch<SetStateAction<T>>] {
+}>(initials: T | (() => T)): readonly [T, Dispatch<SetStateAction<T>>]
+function useUrlState<T extends {
+    [x: string]: QueryValue<string> | undefined
+    "#"?: string
+}>(initials: T | (() => T), options: { noCoerce: true }): readonly [T, Dispatch<SetStateAction<T>>]
+function useUrlState<T extends {
+    [x: string]: QueryValue | undefined
+    "#"?: string
+}>(initials: T | (() => T), options: {
+    noCoerce: true
+} | undefined = undefined): readonly [T, Dispatch<SetStateAction<T>>] {
     const [search, setSearch] = useState(location.search)
     const [state, _setState] = useState(() => {
         let state: T
-        const hash = location.hash && location.hash !== "#" ? location.hash.slice(1) : undefined
+        const hash = location.hash && location.hash !== "#"
+            ? location.hash.slice(1)
+            : undefined
 
         if (location.search && location.search !== "?") {
-            state = decodeQueryString(location.search) as T
+            state = decodeQueryString(location.search, options?.noCoerce) as T
         } else {
             if (typeof initials === "function") {
                 initials = initials()
@@ -99,7 +123,7 @@ export default function useUrlState<T extends {
     useEffect(() => {
         if (location.search !== search) {
             // sync initial state from URL
-            const _state = decodeQueryString(location.search) as T
+            const _state = decodeQueryString(location.search, options?.noCoerce) as T
             const hash = location.hash && location.hash !== "#"
                 ? location.hash.slice(1)
                 : undefined
@@ -116,7 +140,12 @@ export default function useUrlState<T extends {
     return [state, setState] as const
 }
 
-function encodeQueryString(data: Record<string, unknown>, addQueryPrefix = false): string {
+export default useUrlState
+
+function encodeQueryString(
+    data: Record<string, QueryValue | undefined>,
+    addQueryPrefix = false
+): string {
     return qs.stringify(data, {
         strictNullHandling: true,
         arrayFormat: "comma",
@@ -127,7 +156,7 @@ function encodeQueryString(data: Record<string, unknown>, addQueryPrefix = false
     })
 }
 
-function decodeQueryString(str: string): Record<string, unknown> {
+function decodeQueryString(str: string, noCoerce = false): Record<string, QueryValue> {
     const source = qs.parse(str, {
         comma: true,
         allowDots: true,
@@ -135,6 +164,10 @@ function decodeQueryString(str: string): Record<string, unknown> {
         ignoreQueryPrefix: true,
         strictNullHandling: true,
     })
+
+    if (noCoerce) {
+        return source as Record<string, QueryValue>
+    }
 
     // deno-lint-ignore no-explicit-any
     return (function toClosestType(value: string | Record<string, unknown> | any[]): any {
@@ -162,5 +195,5 @@ function decodeQueryString(str: string): Record<string, unknown> {
         } else {
             return value
         }
-    })(source) as Record<string, unknown>
+    })(source) as Record<string, QueryValue>
 }
