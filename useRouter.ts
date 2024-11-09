@@ -53,7 +53,7 @@ export interface PageRouter<P extends Record<string, string | undefined>> {
 
 /**
  * Returns the {@link PageRouter} object, which contains the methods for
- * manipulating the route and retrieving the route parameters.
+ * manipulating the route and retrieving route parameters.
  * 
  * NOTE: This hook only works with history-based routing, it does not work with
  * hash-based routing.

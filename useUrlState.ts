@@ -4,8 +4,8 @@ import { isPlainObject, omit } from "@ayonli/jsext/object"
 import qs from "qs"
 
 /**
- * Similar to `React.useState()`, but persist the state to the URL query
- * parameters so that the state can be restored after refreshing the page.
+ * Similar to `useState`, but persist the state to the URL query parameters so
+ * that the state can be restored after refreshing the page.
  * 
  * NOTE: This hook only works with history-based routing, it does not work with
  * hash-based routing.
