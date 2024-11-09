@@ -2,11 +2,11 @@ import { describe, expect, test } from "vitest"
 import { act, waitFor } from "@testing-library/react"
 import { sleep } from "@ayonli/jsext/async"
 import { renderHook } from "./testing.tsx"
-import useSubmitCallback from "./useSubmitCallback.ts"
+import useSubmit from "./useSubmit.ts"
 
-describe("useSubmitCallback", () => {
+describe("useSubmit", () => {
     test("success", async () => {
-        const { result: ref } = renderHook(() => useSubmitCallback(async (_signal, name: string) => {
+        const { result: ref } = renderHook(() => useSubmit(async (_signal, name: string) => {
             return "Hello, " + name
         }))
 
@@ -28,7 +28,7 @@ describe("useSubmitCallback", () => {
     })
 
     test("error", async () => {
-        const { result: ref } = renderHook(() => useSubmitCallback(async (_signal, name: string) => {
+        const { result: ref } = renderHook(() => useSubmit(async (_signal, name: string) => {
             void name
             throw new Error("something went wrong")
         }))
@@ -51,7 +51,7 @@ describe("useSubmitCallback", () => {
     })
 
     test("abort", async () => {
-        const { result: ref } = renderHook(() => useSubmitCallback((signal, name: string) => {
+        const { result: ref } = renderHook(() => useSubmit((signal, name: string) => {
             return new Promise((resolve, reject) => {
                 if (signal.aborted)
                     reject(signal.reason ?? new Error("Request aborted"))
@@ -85,7 +85,7 @@ describe("useSubmitCallback", () => {
     })
 
     test("abort with reason", async () => {
-        const { result: ref } = renderHook(() => useSubmitCallback((signal, name: string) => {
+        const { result: ref } = renderHook(() => useSubmit((signal, name: string) => {
             return new Promise((resolve, reject) => {
                 if (signal.aborted)
                     reject(signal.reason ?? new Error("Request aborted"))

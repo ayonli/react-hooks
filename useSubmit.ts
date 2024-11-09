@@ -17,7 +17,7 @@ export enum SubmitState {
  * 
  * @example
  * ```tsx
- * import useSubmitCallback from "./useSubmitCallback.ts"
+ * import useSubmit from "./useSubmit.ts"
  * 
  * export default function MyForm() {
  *     const {
@@ -25,7 +25,7 @@ export enum SubmitState {
  *         state,
  *         result,
  *         error,
- *     } = useSubmitCallback(async (signal, data: FormData) => {
+ *     } = useSubmit(async (signal, data: FormData) => {
  *         const res = await fetch("/api/submit", {
  *             method: "POST",
  *             body: data,
@@ -53,7 +53,7 @@ export enum SubmitState {
  * }
  * ```
  */
-export default function useSubmitCallback<T, R, E extends unknown = unknown>(
+export default function useSubmit<T, R, E extends unknown = unknown>(
     fn: (signal: AbortSignal, data: T) => Promise<R>
 ): {
     submit: (data: T) => void
