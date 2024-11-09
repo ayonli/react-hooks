@@ -9,19 +9,29 @@
     "npm:@types/qs@^6.9.17": "6.9.17",
     "npm:@types/react@^18.3.12": "18.3.12",
     "npm:glob@11": "11.0.0",
+    "npm:iconv-lite@~0.6.3": "0.6.3",
     "npm:jsdom@^25.0.1": "25.0.1",
     "npm:qs@^6.13.0": "6.13.0",
     "npm:react-router-dom@^6.28.0": "6.28.0_react@18.3.1_react-dom@18.3.1__react@18.3.1",
     "npm:react-router@^6.28.0": "6.28.0_react@18.3.1",
     "npm:react@^18.3.1": "18.3.1",
+    "npm:sudo-prompt@^9.2.1": "9.2.1",
     "npm:typescript@^5.6.3": "5.6.3",
     "npm:vite-plugin-dts@^4.3.0": "4.3.0_typescript@5.6.3_vite@5.4.10",
     "npm:vite@^5.4.10": "5.4.10",
-    "npm:vitest@^2.1.4": "2.1.4_jsdom@25.0.1_vite@5.4.10"
+    "npm:vitest@^2.1.4": "2.1.4_jsdom@25.0.1_vite@5.4.10",
+    "npm:ws@^8.18.0": "8.18.0",
+    "npm:zod@^3.23.8": "3.23.8"
   },
   "jsr": {
     "@ayonli/jsext@0.9.72": {
-      "integrity": "c88e02c2742075c97ab32f18afa2c7dc8fa36db33cdc6daf099ead8fbbc5ffd9"
+      "integrity": "c88e02c2742075c97ab32f18afa2c7dc8fa36db33cdc6daf099ead8fbbc5ffd9",
+      "dependencies": [
+        "npm:iconv-lite",
+        "npm:sudo-prompt",
+        "npm:ws",
+        "npm:zod"
+      ]
     }
   },
   "npm": {
