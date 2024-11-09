@@ -15,6 +15,8 @@ export enum SubmitState {
  * 
  * @param fn The request function, it should return a promise that resolves to
  * the result, or rejects with an error.
+ * @param deps The dependencies that will renew the submit function and state
+ * when changed.
  * 
  * @example
  * ```tsx
@@ -44,7 +46,10 @@ export enum SubmitState {
  *     }
  * 
  *     return (
- *         <form action={submit}>
+ *         <form onSubmit={e => {
+ *             e.preventDefault();
+ *             submit(new FormData(e.target as HTMLFormElement));
+ *         }}>
  *             <input type="text" name="name" disabled={state === 1} />
  *             <button type="submit" disabled={state === 1}>
  *                 {state === 1 ? "Submitting..." : "Submit"}
@@ -55,7 +60,8 @@ export enum SubmitState {
  * ```
  */
 export default function useSubmit<T, R, E extends unknown = unknown>(
-    fn: (signal: AbortSignal, data: T) => Promise<R>
+    fn: (signal: AbortSignal, data: T) => Promise<R>,
+    deps: readonly unknown[] = [] as unknown[]
 ): {
     submit: (data: T) => void
     state: SubmitState
@@ -70,6 +76,16 @@ export default function useSubmit<T, R, E extends unknown = unknown>(
         error: undefined as E | undefined,
         abort: (reason: E | undefined = undefined) => void reason as void,
     })
+
+    useEffect(() => {
+        setData(undefined)
+        setState({
+            state: SubmitState.NOT_STARTED,
+            result: undefined,
+            error: undefined,
+            abort: (reason = undefined) => void reason as void,
+        })
+    }, deps)
 
     useEffect(() => {
         if (data === undefined || state.state !== SubmitState.NOT_STARTED) {

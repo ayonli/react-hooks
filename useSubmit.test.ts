@@ -117,4 +117,48 @@ describe("useSubmit", () => {
         expect(ref.current.error).toBeInstanceOf(Error)
         expect(String(ref.current.error)).includes("User canceled")
     })
+
+    test("deps change", async () => {
+        const { rerender, result: ref } = renderHook((props: {
+            greeting: string
+        }) => useSubmit(async (_signal, name: string) => {
+            return props.greeting + ", " + name
+        }, [props.greeting]), {
+            initialProps: {
+                greeting: "Hello",
+            },
+        })
+
+        expect(ref.current.state).toBe(0)
+        expect(ref.current.result).toBe(undefined)
+        expect(ref.current.error).toBe(undefined)
+
+        act(() => ref.current.submit("Alice"))
+
+        expect(ref.current.state).toBe(1)
+        expect(ref.current.result).toBe(undefined)
+        expect(ref.current.error).toBe(undefined)
+
+        await waitFor(() => ref.current.state === 2)
+
+        expect(ref.current.state).toBe(2)
+        expect(ref.current.result).toBe("Hello, Alice")
+        expect(ref.current.error).toBe(undefined)
+
+        act(() => rerender({ greeting: "Hi" }))
+
+        expect(ref.current.state).toBe(0)
+
+        act(() => ref.current.submit("Bob"))
+
+        expect(ref.current.state).toBe(1)
+        expect(ref.current.result).toBe(undefined)
+        expect(ref.current.error).toBe(undefined)
+
+        await waitFor(() => ref.current.state === 2)
+
+        expect(ref.current.state).toBe(2)
+        expect(ref.current.result).toBe("Hi, Bob")
+        expect(ref.current.error).toBe(undefined)
+    })
 })
