@@ -1,7 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { type ReactNode } from "react"
-import { BrowserRouter as Router, useLocation, useRoutes } from "react-router-dom"
+import { BrowserRouter as Router, useRoutes } from "react-router-dom"
 import { render as _render, renderHook as _renderHook, type RenderOptions } from "@testing-library/react"
+import useRouter from "./useRouter.ts"
 
 function App({ children }: { children: ReactNode }) {
     useRoutes([
@@ -12,12 +13,16 @@ function App({ children }: { children: ReactNode }) {
         {
             path: "/about",
             element: <div>About Page</div>
+        },
+        {
+            path: "/users/:id",
+            element: <div>User Page</div>
         }
     ])
-    const location = useLocation()
+    const router = useRouter()
 
     return (
-        <React.Fragment key={location.key}>
+        <React.Fragment key={router.key}>
             {children}
         </React.Fragment>
     )
