@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "description": "A group of react hooks that makes life easier.",
     "type": "module",
-    "types": "dist/index.d.ts",
+    "types": "./dist/index.d.ts",
     "exports": "./dist/index.js",
     "scripts": {
         "build": "vite build",
