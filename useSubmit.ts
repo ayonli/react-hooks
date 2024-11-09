@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18"
 import { useEffect, useState } from "react"
 
 export enum SubmitState {

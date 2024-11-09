@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react"
+// @deno-types="npm:@types/react@18"
+import { type Dispatch, type SetStateAction, useCallback, useRef, useState } from "react"
 
 /**
  * This hook adds additional functions to the `useState` hook, allowing us to

@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18"
 import { useCallback } from "react"
 import debounce from "@ayonli/jsext/debounce"
 

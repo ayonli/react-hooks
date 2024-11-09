@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
+import { act } from "@testing-library/react"
 import { renderHook } from "./testing.tsx"
 import useRevertibleState from "./useRevertibleState.ts"
-import { act } from "@testing-library/react"
 
 describe("useRevertibleState", () => {
     test("initial state", () => {

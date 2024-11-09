@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react"
+// @deno-types="npm:@types/react@18"
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
 import { isPlainObject, omit } from "@ayonli/jsext/object"
 import qs from "qs"
 
@@ -42,7 +43,7 @@ import qs from "qs"
  * ```
  */
 export default function useUrlState<T extends {
-    [x: string]: any
+    [x: string]: unknown
     "#"?: string
 }>(initials: T | (() => T)): readonly [T, Dispatch<SetStateAction<T>>] {
     const [search, setSearch] = useState(location.search)
@@ -75,7 +76,7 @@ export default function useUrlState<T extends {
             path += "#" + newState["#"]
         }
 
-        window.history.replaceState(null, "", path)
+        globalThis.history.replaceState(null, "", path)
         _setState(newState)
         setSearch(search)
     }), [_setState, state])
@@ -90,7 +91,7 @@ export default function useUrlState<T extends {
                 path += "#" + state["#"]
             }
 
-            window.history.replaceState(null, "", path)
+            globalThis.history.replaceState(null, "", path)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -115,7 +116,7 @@ export default function useUrlState<T extends {
     return [state, setState] as const
 }
 
-function encodeQueryString(data: Record<string, any>, addQueryPrefix = false): string {
+function encodeQueryString(data: Record<string, unknown>, addQueryPrefix = false): string {
     return qs.stringify(data, {
         strictNullHandling: true,
         arrayFormat: "comma",
@@ -126,7 +127,7 @@ function encodeQueryString(data: Record<string, any>, addQueryPrefix = false): s
     })
 }
 
-function decodeQueryString(str: string): Record<string, any> {
+function decodeQueryString(str: string): Record<string, unknown> {
     const source = qs.parse(str, {
         comma: true,
         allowDots: true,
@@ -135,7 +136,8 @@ function decodeQueryString(str: string): Record<string, any> {
         strictNullHandling: true,
     })
 
-    return (function toClosestType(value: string | Record<string, any> | any[]): any {
+    // deno-lint-ignore no-explicit-any
+    return (function toClosestType(value: string | Record<string, unknown> | any[]): any {
         if (typeof value === "string") {
             if (value === "true") {
                 return true
@@ -154,10 +156,11 @@ function decodeQueryString(str: string): Record<string, any> {
             return value.map(toClosestType)
         } else if (isPlainObject(value)) {
             return Object.fromEntries(
-                Object.entries(value).map(([key, val]) => [key, toClosestType(val)])
+                // deno-lint-ignore no-explicit-any
+                Object.entries(value).map(([key, val]) => [key, toClosestType(val as any)])
             )
         } else {
             return value
         }
-    })(source) as Record<string, any>
+    })(source) as Record<string, unknown>
 }

@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { act, waitFor } from "@testing-library/react"
 import { sleep } from "@ayonli/jsext/async"
-import { as } from "@ayonli/jsext/object"
 import { renderHook } from "./testing.tsx"
 import useAsyncData from "./useAsyncData.ts"
 

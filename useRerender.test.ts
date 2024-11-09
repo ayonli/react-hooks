@@ -1,6 +1,6 @@
 import { expect, test } from "vitest"
 import { act, renderHook } from "@testing-library/react"
-import { useRerender } from "./useRerender.ts"
+import useRerender from "./useRerender.ts"
 
 test("useRerender", () => {
     const { result } = renderHook(() => useRerender())

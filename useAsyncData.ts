@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react"
+// @deno-types="npm:@types/react@18"
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
 
 /**
  * Asynchronously load remote data, usually used with {@link fetch} API, returns

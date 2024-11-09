@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { ReactNode } from "react"
+import React, { type ReactNode } from "react"
 import { BrowserRouter as Router, useLocation, useRoutes } from "react-router-dom"
-import { render as _render, renderHook as _renderHook, RenderOptions } from "@testing-library/react"
+import { render as _render, renderHook as _renderHook, type RenderOptions } from "@testing-library/react"
 
 function App({ children }: { children: ReactNode }) {
     useRoutes([
@@ -33,7 +33,7 @@ function Wrapper({ children }: { children: ReactNode }) {
 
 export const render: typeof _render = ((ui: ReactNode, options?: RenderOptions) => {
     return _render(ui, { wrapper: Wrapper, ...options })
-}) as any
+}) as unknown as typeof _render
 
 export const renderHook: typeof _renderHook = (fn, options = {}) => {
     return _renderHook(fn, { wrapper: Wrapper, ...options })

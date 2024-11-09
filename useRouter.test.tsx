@@ -1,8 +1,10 @@
+// deno-lint-ignore verbatim-module-syntax
+import * as React from "react"
 import { useState } from "react"
 import { useLocation } from "react-router"
+import { describe, expect, test } from "vitest"
 import { act, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
-import { describe, expect, test } from "vitest"
 import { render, renderHook } from "./testing.tsx"
 import useRouter from "./useRouter.ts"
 

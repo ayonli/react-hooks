@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+// @deno-types="npm:@types/react@18"
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 
 /**
  * Uses a prop as the state in a component, and when the prop changes,

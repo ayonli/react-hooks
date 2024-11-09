@@ -1,0 +1,13 @@
+.vscode
+node_modules
+deno.json
+deno.lock
+package-lock.json
+.*
+*.test.ts
+*.test.tsx
+vite.config.ts
+vitest-setup.tsx
+*.tgz
+testing.tsx
+tsconfig.json

@@ -1,5 +1,6 @@
+// @deno-types="npm:@types/react@18"
 import { useState } from "react"
-import { NavigateOptions, To, useNavigate, useParams } from "react-router"
+import { type NavigateOptions, type To, useNavigate, useParams } from "react-router"
 
 export type PushOptions = Omit<NavigateOptions, "replace">
 
@@ -105,7 +106,7 @@ export default function useRouter<P extends Record<string, string | undefined>>(
                 } else if (options.replace) {
                     location.href = href
                 } else {
-                    window.open(href, "_blank")
+                    globalThis.open(href, "_blank")
                 }
             } else if (to instanceof URLSearchParams) {
                 const query = to.toString()
@@ -153,7 +154,7 @@ export default function useRouter<P extends Record<string, string | undefined>>(
                     path = (to.pathname ?? "/") + (to.search ?? "") + (to.hash ?? "")
                 }
 
-                window.history.replaceState(null, "", path)
+                globalThis.history.replaceState(null, "", path)
             }
         }
 
