@@ -1,18 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { ReactNode } from "react"
-import { RouteObject, BrowserRouter as Router, useLocation, useRoutes } from "react-router-dom"
+import { BrowserRouter as Router, useLocation, useRoutes } from "react-router-dom"
 import { render as _render, renderHook as _renderHook, RenderOptions } from "@testing-library/react"
 
-let _routes: RouteObject[] = []
-
-export function setup(routes: RouteObject[]) {
-    _routes = routes
-}
-
 function App({ children }: { children: ReactNode }) {
-    const routes = [..._routes]
-
-    useRoutes(routes)
+    useRoutes([
+        {
+            path: "/",
+            element: <div>Home Page</div>
+        },
+        {
+            path: "/about",
+            element: <div>About Page</div>
+        }
+    ])
     const location = useLocation()
 
     return (
@@ -23,7 +24,11 @@ function App({ children }: { children: ReactNode }) {
 }
 
 function Wrapper({ children }: { children: ReactNode }) {
-    return <Router><App>{children} </App></Router >
+    return (
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <App>{children}</App>
+        </Router >
+    )
 }
 
 export const render: typeof _render = ((ui: ReactNode, options?: RenderOptions) => {
