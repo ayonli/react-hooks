@@ -14,7 +14,7 @@ import debounce from "@ayonli/jsext/debounce"
  * @example
  * ```tsx
  * import { useState } from "react"
- * import useDebouncedCallback from "./useDebouncedCallback.ts"
+ * import { useDebouncedCallback } from "@ayonli/react-hooks"
  * 
  * export default function SearchBox() {
  *     const [options, setOptions] = useState<string[]>([])

@@ -7,7 +7,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
  * 
  * @example
  * ```tsx
- * import usePropState from "./usePropState.ts"
+ * import { usePropState } from "@ayonli/react-hooks"
  * 
  * export default function MyComponent(props: { name: string }) {
  *     const [name, setName] = usePropState(props.name)

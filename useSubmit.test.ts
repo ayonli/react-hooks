@@ -10,19 +10,22 @@ describe("useSubmit", () => {
             return "Hello, " + name
         }))
 
-        expect(ref.current.state).toBe(0)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.submit("Alice"))
 
-        expect(ref.current.state).toBe(1)
+        expect(ref.current.pending).toBe(true)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
-        await waitFor(() => ref.current.state === 2)
+        await waitFor(() => ref.current.done)
 
-        expect(ref.current.state).toBe(2)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(true)
         expect(ref.current.result).toBe("Hello, Alice")
         expect(ref.current.error).toBe(undefined)
     })
@@ -33,19 +36,22 @@ describe("useSubmit", () => {
             throw new Error("something went wrong")
         }))
 
-        expect(ref.current.state).toBe(0)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.submit("Alice"))
 
-        expect(ref.current.state).toBe(1)
+        expect(ref.current.pending).toBe(true)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
-        await waitFor(() => ref.current.state === 2)
+        await waitFor(() => ref.current.done)
 
-        expect(ref.current.state).toBe(2)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(true)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBeInstanceOf(Error)
     })
@@ -64,21 +70,24 @@ describe("useSubmit", () => {
             })
         }))
 
-        expect(ref.current.state).toBe(0)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.submit("Alice"))
 
-        expect(ref.current.state).toBe(1)
+        expect(ref.current.pending).toBe(true)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.abort())
 
-        await waitFor(() => ref.current.state === 2)
+        await waitFor(() => ref.current.done)
 
-        expect(ref.current.state).toBe(2)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(true)
         expect(ref.current.result).toBe(undefined)
         expect(typeof ref.current.error).toBe("object")
         expect(String(ref.current.error)).includes("The operation was aborted.")
@@ -98,21 +107,24 @@ describe("useSubmit", () => {
             })
         }))
 
-        expect(ref.current.state).toBe(0)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.submit("Alice"))
 
-        expect(ref.current.state).toBe(1)
+        expect(ref.current.pending).toBe(true)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.abort(new Error("User canceled")))
 
-        await waitFor(() => ref.current.state === 2)
+        await waitFor(() => ref.current.done)
 
-        expect(ref.current.state).toBe(2)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(true)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBeInstanceOf(Error)
         expect(String(ref.current.error)).includes("User canceled")
@@ -129,35 +141,41 @@ describe("useSubmit", () => {
             },
         })
 
-        expect(ref.current.state).toBe(0)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
         act(() => ref.current.submit("Alice"))
 
-        expect(ref.current.state).toBe(1)
+        expect(ref.current.pending).toBe(true)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
-        await waitFor(() => ref.current.state === 2)
+        await waitFor(() => ref.current.done)
 
-        expect(ref.current.state).toBe(2)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(true)
         expect(ref.current.result).toBe("Hello, Alice")
         expect(ref.current.error).toBe(undefined)
 
         act(() => rerender({ greeting: "Hi" }))
 
-        expect(ref.current.state).toBe(0)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(false)
 
         act(() => ref.current.submit("Bob"))
 
-        expect(ref.current.state).toBe(1)
+        expect(ref.current.pending).toBe(true)
+        expect(ref.current.done).toBe(false)
         expect(ref.current.result).toBe(undefined)
         expect(ref.current.error).toBe(undefined)
 
-        await waitFor(() => ref.current.state === 2)
+        await waitFor(() => ref.current.done)
 
-        expect(ref.current.state).toBe(2)
+        expect(ref.current.pending).toBe(false)
+        expect(ref.current.done).toBe(true)
         expect(ref.current.result).toBe("Hi, Bob")
         expect(ref.current.error).toBe(undefined)
     })

@@ -10,7 +10,7 @@ import { useCallback, useState } from "react"
  * 
  * @example
  * ```tsx
- * import useRerender from "./useRerender.ts"
+ * import { useRerender } from "@ayonli/react-hooks"
  * 
  * export default function MyComponent() {
  *     const [rerender] = useRerender()

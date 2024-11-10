@@ -24,7 +24,7 @@ export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
  * 
  * @example
  * ```tsx
- * import useUrlState from "./useUrlState.ts"
+ * import { useUrlState } from "@ayonli/react-hooks"
  * import { render } from "@testing-library/react"
  * import { userEvent } from "@testing-library/user-event"
  * 

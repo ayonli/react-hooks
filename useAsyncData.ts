@@ -2,9 +2,34 @@
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
 
 /**
- * Asynchronously load remote data, usually used with {@link fetch} API, returns
- * an object containing the `loading` state, the `data` if available, an `error`
- * if occurred, and a `setData` function to manually update the data.
+ * Represents the state of an asynchronous data request, returned by the
+ * {@link useAsyncData} hook.
+ */
+export interface AsyncDataState<T, E> {
+    /**
+     * Whether the data is still loading.
+     */
+    loading: boolean
+    /**
+     * The data if available, `undefined` if not.
+     */
+    data: T | undefined
+    /**
+     * The error occurred during the request, if any.
+     */
+    error: E | undefined
+    /**
+     * Aborts the request manually.
+     */
+    abort: (reason?: E) => void
+    /**
+     * Manually updates the data.
+     */
+    setData: Dispatch<SetStateAction<T>>
+}
+
+/**
+ * Asynchronously loads remote data, usually used with {@link fetch} API.
  *
  * @param fn The request function, it should return a promise that resolves to
  * the data, or rejects with an error.
@@ -14,7 +39,7 @@ import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } 
  *
  * @example
  * ```tsx
- * import useAsyncData from "./useAsyncData.ts"
+ * import { useAsyncData } from "@ayonli/react-hooks"
  *
  * export function UserComponent() {
  *     const { loading, data, error } = useAsyncData(async signal => {
@@ -57,13 +82,7 @@ export default function useAsyncData<T, D extends unknown[] = [], E extends unkn
     fn: (signal: AbortSignal, deps: D, setData: Dispatch<SetStateAction<T>>) => Promise<T>,
     deps: D = [] as unknown as D,
     shouldRequest: ((...deps: D) => boolean) | undefined = undefined
-): {
-    loading: boolean
-    data: T | undefined
-    error: E | undefined
-    abort: (reason?: E) => void
-    setData: Dispatch<SetStateAction<T>>
-} {
+): AsyncDataState<T, E> {
     const [state, setState] = useState({
         loading: false,
         data: undefined as T | undefined,
@@ -92,25 +111,25 @@ export default function useAsyncData<T, D extends unknown[] = [], E extends unkn
 
         setState({
             loading: true,
-            abort: (reason = undefined) => ctrl.abort(reason),
             data: undefined,
             error: undefined,
+            abort: (reason = undefined) => ctrl.abort(reason),
         })
 
         fn(signal, deps, setData).then(data => {
-            setState(state => ({
-                ...state,
+            setState({
                 loading: false,
                 data,
                 error: undefined,
-            }))
+                abort: (reason = undefined) => void reason as void
+            })
         }).catch(err => {
-            setState(state => ({
-                ...state,
+            setState({
                 loading: false,
                 data: undefined,
                 error: err as E,
-            }))
+                abort: (reason = undefined) => void reason as void
+            })
         })
 
         return () => {

@@ -4,7 +4,7 @@ import { type NavigateOptions, type To, useLocation, useNavigate, useParams } fr
 
 export type PushOptions = Omit<NavigateOptions, "replace">
 
-export type ReplaceOptions = Omit<NavigateOptions, "replace"> & {
+export type ReplaceOptions = PushOptions & {
     /**
      * Replace the URL but do not trigger page reload. This option is only
      * available with history-based routing.
@@ -91,7 +91,7 @@ export interface PageRouter<P extends Record<string, string | undefined>> {
  * 
  * @example
  * ```tsx
- * import useRouter from "./useRouter.ts"
+ * import { useRouter } from "@ayonli/react-hooks"
  * import { render } from "@testing-library/react"
  * import { userEvent } from "@testing-library/user-event"
  * 

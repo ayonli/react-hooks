@@ -2,11 +2,30 @@
 import { type Dispatch, type SetStateAction, useCallback, useRef, useState } from "react"
 
 /**
+ * Contains the actions that can be performed on the state history, returned by
+ * the {@link useRevertibleState} hook.
+ */
+export interface RevertActions {
+    /**
+     * Reverts to the previous state.
+     */
+    undo: () => void
+    /**
+     * Reverts to the next state that was previously undone by `undo`.
+     */
+    redo: () => void
+    /**
+     * Clears the history and sets the state to the initial state.
+     */
+    clear: () => void
+}
+
+/**
  * This hook adds additional functions to the `useState` hook, allowing us to
  * undo and redo state changes.
  * 
  * ```tsx
- * import useRevertibleState from "./useRevertibleState.ts"
+ * import { useRevertibleState } from "@ayonli/react-hooks"
  * 
  * export default function MyComponent() {
  *     const [text, setText, { undo, redo }] = useRevertibleState("")
@@ -21,11 +40,7 @@ import { type Dispatch, type SetStateAction, useCallback, useRef, useState } fro
  * }
  * ```
  */
-export default function useRevertibleState<T>(initial: T): [T, Dispatch<SetStateAction<T>>, {
-    undo: () => void
-    redo: () => void
-    clear: () => void
-}] {
+export default function useRevertibleState<T>(initial: T): [T, Dispatch<SetStateAction<T>>, RevertActions] {
     const [state, setState] = useState(initial)
     const [history, setHistory] = useState([initial])
     const index = useRef(0)
