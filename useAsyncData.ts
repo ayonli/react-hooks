@@ -117,19 +117,17 @@ export default function useAsyncData<T, D extends unknown[] = [], E extends unkn
         })
 
         fn(signal, deps, setData).then(data => {
-            setState({
+            setState(state => ({
+                ...state,
                 loading: false,
                 data,
-                error: undefined,
-                abort: (reason = undefined) => void reason as void
-            })
+            }))
         }).catch(err => {
-            setState({
+            setState(state => ({
+                ...state,
                 loading: false,
-                data: undefined,
                 error: err as E,
-                abort: (reason = undefined) => void reason as void
-            })
+            }))
         })
 
         return () => {

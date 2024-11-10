@@ -124,21 +124,19 @@ export default function useSubmit<T, R, E extends unknown = unknown>(
         })
 
         fn(signal, data as T).then(result => {
-            setState({
+            setState(state => ({
+                ...state,
                 pending: false,
                 done: true,
                 result,
-                error: undefined,
-                abort: (reason = undefined) => void reason as void,
-            })
+            }))
         }).catch(err => {
-            setState({
+            setState(state => ({
+                ...state,
                 pending: false,
                 done: true,
-                result: undefined,
                 error: err as E,
-                abort: (reason = undefined) => void reason as void,
-            })
+            }))
         })
 
         return () => {
@@ -147,8 +145,5 @@ export default function useSubmit<T, R, E extends unknown = unknown>(
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data])
 
-    return {
-        submit: setData,
-        ...state,
-    }
+    return { submit: setData, ...state }
 }
