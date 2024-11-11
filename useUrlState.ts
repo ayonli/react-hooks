@@ -1,29 +1,43 @@
-import { useCallback, useEffect, useState } from "react"
+// @deno-types="npm:@types/react@18"
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
 import { isPlainObject, omit } from "@ayonli/jsext/object"
+// @deno-types="npm:@types/qs@6"
 import qs from "qs"
-import useRouter from "./useRouter.ts"
+
+export type Scalar = string | number | boolean | null
+export type QueryValue<T extends Scalar = Scalar> = T | QueryObject<T> | QueryArray<T>
+export type QueryObject<T extends Scalar = Scalar> = Record<string, T>
+export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
 
 /**
- * Similar to `React.useState()`, but will persist the state to the URL query
- * parameters so that the state can be restored after refreshing the page.
+ * Similar to `useState`, but persist the state to the URL query parameters so
+ * that the state can be restored after refreshing the page.
  * 
  * NOTE: This hook only works with history-based routing, it does not work with
  * hash-based routing.
  * 
+ * NOTE: This hook automatically coerces the query parameters to the closest
+ * JavaScript type, for example, `"true"` and `"false"` will be converted to
+ * boolean, `"null"` will be converted to `null`, and numeric strings will be
+ * converted to numbers. To disable this behavior, set the `noCoerce` option to
+ * `true`.
+ * 
  * @example
  * ```tsx
- * import useUrlState from "./useUrlState.ts"
+ * import { useUrlState } from "@ayonli/react-hooks"
  * import { render } from "@testing-library/react"
  * import { userEvent } from "@testing-library/user-event"
  * 
- * export default function View() {
+ * export default function ProfileView() {
  *     const [state, setState] = useUrlState({ name: "Alice", age: 18 })
  * 
  *     return (
  *         <div>
  *             <h1>Name: {state.name}</h1>
  *             <p>Age: {state.age}</p>
- *             <button onClick={() => setState({ name: "Bob", age: 20 })}>Change Name</button>
+ *             <button onClick={() => setState({ name: "Bob", age: 20 })}>
+ *                 Change Profile
+ *             </button>
  *         </div>
  *     )
  * }
@@ -40,18 +54,29 @@ import useRouter from "./useRouter.ts"
  * dom.debug()
  * ```
  */
-export default function useUrlState<T extends {
-    [x: string]: any
+function useUrlState<T extends {
+    [x: string]: QueryValue | undefined
     "#"?: string
-}>(initials: T | (() => T)) {
-    const router = useRouter()
+}>(initials: T | (() => T)): readonly [T, Dispatch<SetStateAction<T>>]
+function useUrlState<T extends {
+    [x: string]: QueryValue<string> | undefined
+    "#"?: string
+}>(initials: T | (() => T), options: { noCoerce: true }): readonly [T, Dispatch<SetStateAction<T>>]
+function useUrlState<T extends {
+    [x: string]: QueryValue | undefined
+    "#"?: string
+}>(initials: T | (() => T), options: {
+    noCoerce: true
+} | undefined = undefined): readonly [T, Dispatch<SetStateAction<T>>] {
     const [search, setSearch] = useState(location.search)
     const [state, _setState] = useState(() => {
         let state: T
-        const hash = location.hash && location.hash !== "#" ? location.hash.slice(1) : undefined
+        const hash = location.hash && location.hash !== "#"
+            ? location.hash.slice(1)
+            : undefined
 
         if (location.search && location.search !== "?") {
-            state = decodeQueryString(location.search) as T
+            state = decodeQueryString(location.search, options?.noCoerce) as T
         } else {
             if (typeof initials === "function") {
                 initials = initials()
@@ -75,10 +100,10 @@ export default function useUrlState<T extends {
             path += "#" + newState["#"]
         }
 
-        router.replace(path, { silent: true })
+        globalThis.history.replaceState(null, "", path)
         _setState(newState)
         setSearch(search)
-    }), [_setState, router, state])
+    }), [_setState, state])
 
     useEffect(() => {
         if (Object.keys(state).length !== 0) {
@@ -90,7 +115,7 @@ export default function useUrlState<T extends {
                 path += "#" + state["#"]
             }
 
-            router.replace(path, { silent: true })
+            globalThis.history.replaceState(null, "", path)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -98,7 +123,7 @@ export default function useUrlState<T extends {
     useEffect(() => {
         if (location.search !== search) {
             // sync initial state from URL
-            const _state = decodeQueryString(location.search) as T
+            const _state = decodeQueryString(location.search, options?.noCoerce) as T
             const hash = location.hash && location.hash !== "#"
                 ? location.hash.slice(1)
                 : undefined
@@ -115,7 +140,12 @@ export default function useUrlState<T extends {
     return [state, setState] as const
 }
 
-function encodeQueryString(data: Record<string, any>, addQueryPrefix = false): string {
+export default useUrlState
+
+function encodeQueryString(
+    data: Record<string, QueryValue | undefined>,
+    addQueryPrefix = false
+): string {
     return qs.stringify(data, {
         strictNullHandling: true,
         arrayFormat: "comma",
@@ -126,7 +156,7 @@ function encodeQueryString(data: Record<string, any>, addQueryPrefix = false): s
     })
 }
 
-function decodeQueryString(str: string): Record<string, any> {
+function decodeQueryString(str: string, noCoerce = false): Record<string, QueryValue> {
     const source = qs.parse(str, {
         comma: true,
         allowDots: true,
@@ -135,7 +165,12 @@ function decodeQueryString(str: string): Record<string, any> {
         strictNullHandling: true,
     })
 
-    return (function toClosestType(value: string | Record<string, any> | any[]): any {
+    if (noCoerce) {
+        return source as Record<string, QueryValue>
+    }
+
+    // deno-lint-ignore no-explicit-any
+    return (function toClosestType(value: string | Record<string, unknown> | any[]): any {
         if (typeof value === "string") {
             if (value === "true") {
                 return true
@@ -154,10 +189,11 @@ function decodeQueryString(str: string): Record<string, any> {
             return value.map(toClosestType)
         } else if (isPlainObject(value)) {
             return Object.fromEntries(
-                Object.entries(value).map(([key, val]) => [key, toClosestType(val)])
+                // deno-lint-ignore no-explicit-any
+                Object.entries(value).map(([key, val]) => [key, toClosestType(val as any)])
             )
         } else {
             return value
         }
-    })(source) as Record<string, any>
+    })(source) as Record<string, QueryValue>
 }

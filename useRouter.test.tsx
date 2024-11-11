@@ -1,16 +1,23 @@
+// deno-lint-ignore verbatim-module-syntax
+import * as React from "react"
 import { useState } from "react"
-import { useLocation } from "react-router"
+import { describe, expect, test } from "vitest"
 import { act, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
-import { describe, expect, test } from "vitest"
 import { render, renderHook } from "./testing.tsx"
 import useRouter from "./useRouter.ts"
 
 describe("useRouter", () => {
-    const { result: router } = renderHook(() => useRouter())
+    // test("params", () => {
+    //     const { result: router } = renderHook(() => useRouter())
+    //     act(() => router.current.push("/users/1"))
+    //     expect(location.pathname).toBe("/users/1")
+    //     expect(router.current.params).toStrictEqual({ id: "1" })
+    // })
 
     describe("push", () => {
         test("with string", () => {
+            const { result: router } = renderHook(() => useRouter())
             act(() => router.current.push("/"))
             expect(location.pathname).toBe("/")
 
@@ -18,7 +25,17 @@ describe("useRouter", () => {
             expect(location.pathname).toBe("/about")
         })
 
+        test("with URL", () => {
+            const { result: router } = renderHook(() => useRouter())
+            act(() => router.current.push(new URL("/", location.origin)))
+            expect(location.pathname).toBe("/")
+
+            act(() => router.current.push(new URL("/about", location.origin)))
+            expect(location.pathname).toBe("/about")
+        })
+
         test("with URLSearchParams", () => {
+            const { result: router } = renderHook(() => useRouter())
             act(() => {
                 const params = new URLSearchParams(location.search)
                 params.set("foo", "bar")
@@ -26,10 +43,18 @@ describe("useRouter", () => {
             })
             expect(location.search).toBe("?foo=bar")
         })
+
+        test("with state", () => {
+            const { result: router } = renderHook(() => useRouter())
+            act(() => router.current.push("/", { state: { foo: "bar" } }))
+            expect(location.pathname).toBe("/")
+            expect(router.current.state).toEqual({ foo: "bar" })
+        })
     })
 
     describe("replace", () => {
         test("with string", () => {
+            const { result: router } = renderHook(() => useRouter())
             act(() => router.current.replace("/"))
             expect(location.pathname).toBe("/")
 
@@ -37,7 +62,17 @@ describe("useRouter", () => {
             expect(location.pathname).toBe("/about")
         })
 
+        test("with URL", () => {
+            const { result: router } = renderHook(() => useRouter())
+            act(() => router.current.replace(new URL("/", location.origin)))
+            expect(location.pathname).toBe("/")
+
+            act(() => router.current.replace(new URL("/about", location.origin)))
+            expect(location.pathname).toBe("/about")
+        })
+
         test("with URLSearchParams", () => {
+            const { result: router } = renderHook(() => useRouter())
             act(() => {
                 const params = new URLSearchParams(location.search)
                 params.set("foo", "bar")
@@ -46,23 +81,28 @@ describe("useRouter", () => {
             expect(location.search).toBe("?foo=bar")
         })
 
+        test("with state", () => {
+            const { result: router } = renderHook(() => useRouter())
+            act(() => router.current.replace("/", { state: { foo: "bar" } }))
+            expect(location.pathname).toBe("/")
+            expect(router.current.state).toEqual({ foo: "bar" })
+        })
+
         test("silent", () => {
-            const { result: location1 } = renderHook(() => useLocation())
-            expect(location1.current.state).toBe(null)
+            const { result: router } = renderHook(() => useRouter())
+            act(() => router.current.push("/"))
+            expect(router.current.state).toBe(null)
 
             act(() => router.current.replace("/", { state: { foo: "bar" } }))
+            expect(router.current.state).toEqual({ foo: "bar" })
 
-            const { result: location2 } = renderHook(() => useLocation())
-            expect(location2.current.state).toEqual({ foo: "bar" })
-
-            act(() => router.current.replace("/about", { state: { foo: "bar" }, silent: true }))
-
-            const { result: location3 } = renderHook(() => useLocation())
-            expect(location3.current.state).toEqual(null)
+            act(() => router.current.replace("/about", { state: { foo: "baz" }, silent: true }))
+            expect(router.current.state).toEqual({ foo: "bar" })
         })
     })
 
     test("back", async () => {
+        const { result: router } = renderHook(() => useRouter())
         act(() => router.current.push("/"))
         expect(location.pathname).toBe("/")
 
@@ -75,6 +115,7 @@ describe("useRouter", () => {
     })
 
     test("forward", async () => {
+        const { result: router } = renderHook(() => useRouter())
         act(() => router.current.push("/"))
         expect(location.pathname).toBe("/")
 
@@ -89,6 +130,7 @@ describe("useRouter", () => {
     })
 
     test("go", async () => {
+        const { result: router } = renderHook(() => useRouter())
         act(() => router.current.push("/"))
         expect(location.pathname).toBe("/")
 

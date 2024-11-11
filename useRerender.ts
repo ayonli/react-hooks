@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18"
 import { useCallback, useState } from "react"
 
 /**
@@ -9,7 +10,7 @@ import { useCallback, useState } from "react"
  * 
  * @example
  * ```tsx
- * import useRerender from "./useRerender.ts"
+ * import { useRerender } from "@ayonli/react-hooks"
  * 
  * export default function MyComponent() {
  *     const [rerender] = useRerender()
@@ -22,7 +23,7 @@ import { useCallback, useState } from "react"
  * }
  * ```
  */
-export function useRerender(): [rerender: () => void, counter: number] {
+export default function useRerender(): readonly [rerender: () => void, counter: number] {
     const [n, set] = useState(1)
     const rerender = useCallback(() => set(n => n + 1), [set])
     return [rerender, n] as const

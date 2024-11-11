@@ -1,0 +1,37 @@
+{
+    "name": "@ayonli/react-hooks",
+    "version": "0.1.2",
+    "license": "MIT",
+    "exports": "./index.ts",
+    "imports": {
+        "@ayonli/jsext": "jsr:@ayonli/jsext@^0.9.72",
+        "qs": "npm:qs@^6.13.0",
+        "react": "npm:react@^18.3.1",
+        "react-router": "npm:react-router@^6.28.0"
+    },
+    "nodeModulesDir": "none",
+    "compilerOptions": {
+        "lib": [
+            "deno.ns",
+            "dom"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ],
+    "publish": {
+        "include": [
+            "deno.json",
+            "LICENSE",
+            "README.md",
+            "**/*.ts"
+        ],
+        "exclude": [
+            "node_modules",
+            "dist",
+            "**/*.test.ts",
+            "*.config.ts"
+        ]
+    }
+}
