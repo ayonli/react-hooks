@@ -2,6 +2,7 @@
   "version": "4",
   "specifiers": {
     "jsr:@ayonli/jsext@1": "1.0.0",
+    "npm:@ayonli/jsext@1": "1.0.0",
     "npm:@testing-library/jest-dom@^6.6.3": "6.6.3",
     "npm:@testing-library/react@^16.0.1": "16.0.1_@testing-library+dom@10.4.0_@types+react@18.3.12_react@18.3.1_react-dom@18.3.1__react@18.3.1",
     "npm:@testing-library/user-event@^14.5.2": "14.5.2_@testing-library+dom@10.4.0",
@@ -17,21 +18,38 @@
     "npm:react-router-dom@^6.28.0": "6.28.0_react@18.3.1_react-dom@18.3.1__react@18.3.1",
     "npm:react-router@^6.28.0": "6.28.0_react@18.3.1",
     "npm:react@^18.3.1": "18.3.1",
+    "npm:sudo-prompt@^9.2.1": "9.2.1",
     "npm:typescript@^5.6.3": "5.6.3",
     "npm:vite-plugin-dts@^4.3.0": "4.3.0_typescript@5.6.3_vite@5.4.10",
     "npm:vite@^5.4.10": "5.4.10",
     "npm:vitest@2.1.4": "2.1.4_jsdom@25.0.1_vite@5.4.10",
     "npm:vitest@^2.1.4": "2.1.4_jsdom@25.0.1_vite@5.4.10",
-    "npm:ws@^8.18.0": "8.18.0"
+    "npm:ws@^8.18.0": "8.18.0",
+    "npm:zod@^3.23.8": "3.23.8"
   },
   "jsr": {
     "@ayonli/jsext@1.0.0": {
-      "integrity": "1c724f133a1419bbd5f0d75456a119682754f65b319705885ac11bcf14e6e9cc"
+      "integrity": "1c724f133a1419bbd5f0d75456a119682754f65b319705885ac11bcf14e6e9cc",
+      "dependencies": [
+        "npm:iconv-lite",
+        "npm:sudo-prompt",
+        "npm:ws",
+        "npm:zod"
+      ]
     }
   },
   "npm": {
     "@adobe/css-tools@4.4.0": {
       "integrity": "sha512-Ff9+ksdQQB3rMncgqDK78uLznstjyfIf2Arnh22pW8kBpLs6rpKDwgnZT46hin5Hl1WzazzK64DOrhSwYpS7bQ=="
+    },
+    "@ayonli/jsext@1.0.0": {
+      "integrity": "sha512-53oA2Dw5lAEyh2hdzBgLmRJPIHbjHPILX6gypbRfj26QxYnab/bq0s/h0hIqUYT7vuu8azpVqgOp3KrZVLuKuA==",
+      "dependencies": [
+        "iconv-lite",
+        "sudo-prompt",
+        "ws",
+        "zod"
+      ]
     },
     "@babel/code-frame@7.26.2": {
       "integrity": "sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==",
@@ -1292,6 +1310,9 @@
     "strip-json-comments@3.1.1": {
       "integrity": "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig=="
     },
+    "sudo-prompt@9.2.1": {
+      "integrity": "sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw=="
+    },
     "supports-color@7.2.0": {
       "integrity": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
       "dependencies": [
@@ -1495,6 +1516,9 @@
     },
     "yallist@4.0.0": {
       "integrity": "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A=="
+    },
+    "zod@3.23.8": {
+      "integrity": "sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g=="
     }
   },
   "workspace": {
