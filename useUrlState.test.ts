@@ -138,4 +138,28 @@ describe("useUrlState", () => {
         expect(state2).toStrictEqual({ foo: "baz", "#": "hash2" })
         expect(location.hash).toBe("#hash2")
     })
+
+    test("deep compare", () => {
+        const initial = {
+            foo: "bar",
+            num: 123,
+            bool: true as boolean,
+            nil: null,
+            obj: {
+                hello: "world",
+            }
+        }
+        const { result: result1 } = renderHook(() => useUrlState(initial))
+        const { result: result2 } = renderHook(() => useUrlState(initial, { deepCompare: true }))
+
+        const [state1, setState1] = result1.current
+        act(() => setState1({ ...state1 }))
+        const [_state1] = result1.current
+        expect(state1).not.toBe(_state1)
+
+        const [state2, setState2] = result2.current
+        act(() => setState2(structuredClone(state2)))
+        const [_state2] = result2.current
+        expect(state2).toBe(_state2)
+    })
 })

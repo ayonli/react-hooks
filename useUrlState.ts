@@ -1,6 +1,6 @@
 // @deno-types="npm:@types/react@18"
 import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react"
-import { isPlainObject, omit } from "@ayonli/jsext/object"
+import { equals, isPlainObject, omit } from "@ayonli/jsext/object"
 // @deno-types="npm:@types/qs@6"
 import qs from "qs"
 
@@ -21,6 +21,15 @@ export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
  * boolean, `"null"` will be converted to `null`, and numeric strings will be
  * converted to numbers. To disable this behavior, set the `noCoerce` option to
  * `true`.
+ * 
+ * TIP: By default, like `useState`, the `setState` function will not update
+ * the state if the incoming state is not equal to the current state (using
+ * shallow comparison `===`). But sometimes we would want to update the state
+ * even if the incoming state is not deeply equal to the current state,
+ * especially when we use the state as a dependency in a `useEffect` hook. In
+ * this case, we can set the `deepCompare` option to `true` to enable deep
+ * comparison. If the new state is deeply equal to the current state, the state
+ * will not be updated.
  * 
  * @example
  * ```tsx
@@ -57,16 +66,22 @@ export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
 function useUrlState<T extends {
     [x: string]: QueryValue | undefined
     "#"?: string
-}>(initials: T | (() => T)): readonly [T, Dispatch<SetStateAction<T>>]
+}>(initials: T | (() => T), options?: {
+    deepCompare?: boolean
+}): readonly [T, Dispatch<SetStateAction<T>>]
 function useUrlState<T extends {
     [x: string]: QueryValue<string> | undefined
     "#"?: string
-}>(initials: T | (() => T), options: { noCoerce: true }): readonly [T, Dispatch<SetStateAction<T>>]
+}>(initials: T | (() => T), options: {
+    deepCompare?: boolean
+    noCoerce: true,
+}): readonly [T, Dispatch<SetStateAction<T>>]
 function useUrlState<T extends {
     [x: string]: QueryValue | undefined
     "#"?: string
 }>(initials: T | (() => T), options: {
-    noCoerce: true
+    deepCompare?: boolean
+    noCoerce?: true
 } | undefined = undefined): readonly [T, Dispatch<SetStateAction<T>>] {
     const [search, setSearch] = useState(location.search)
     const [state, _setState] = useState(() => {
@@ -100,6 +115,10 @@ function useUrlState<T extends {
             path += "#" + newState["#"]
         }
 
+        if (options?.deepCompare && equals(newState, state)) {
+            return
+        }
+
         globalThis.history.replaceState(null, "", path)
         _setState(newState)
         setSearch(search)
@@ -130,6 +149,10 @@ function useUrlState<T extends {
 
             if (hash) {
                 _state["#"] = hash
+            }
+
+            if (options?.deepCompare && equals(_state, state)) {
+                return
             }
 
             _setState(_state)
