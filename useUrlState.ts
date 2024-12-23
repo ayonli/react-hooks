@@ -16,11 +16,12 @@ export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
  * NOTE: This hook only works with history-based routing, it does not work with
  * hash-based routing.
  * 
- * NOTE: This hook automatically coerces the query parameters to the closest
- * JavaScript type, for example, `"true"` and `"false"` will be converted to
- * boolean, `"null"` will be converted to `null`, and numeric strings will be
- * converted to numbers. To disable this behavior, set the `noCoerce` option to
- * `true`.
+ * TIP: By default, this hook automatically coerces the query parameters to the
+ * closest JavaScript type, for example, `"true"` and `"false"` will be
+ * converted to boolean, `"null"` will be converted to `null`, and numeric
+ * strings will be converted to numbers. To modify this behavior, set the
+ * `noCoerce` option to instruct the program not to coerce specific paths, or
+ * set the option to `true` to disable coercion entirely.
  * 
  * TIP: By default, like `useState`, the `setState` function will not update
  * the state if the incoming state is not equal to the current state (using
@@ -68,6 +69,7 @@ function useUrlState<T extends {
     "#"?: string
 }>(initials: T | (() => T), options?: {
     deepCompare?: boolean
+    noCoerce?: string[]
 }): readonly [T, Dispatch<SetStateAction<T>>]
 function useUrlState<T extends {
     [x: string]: QueryValue<string> | undefined
@@ -81,7 +83,7 @@ function useUrlState<T extends {
     "#"?: string
 }>(initials: T | (() => T), options: {
     deepCompare?: boolean
-    noCoerce?: true
+    noCoerce?: true | string[]
 } | undefined = undefined): readonly [T, Dispatch<SetStateAction<T>>] {
     const [search, setSearch] = useState(location.search)
     const [state, _setState] = useState(() => {
@@ -179,7 +181,10 @@ function encodeQueryString(
     })
 }
 
-function decodeQueryString(str: string, noCoerce = false): Record<string, QueryValue> {
+function decodeQueryString(
+    str: string,
+    noCoerce: boolean | string[] = false
+): Record<string, QueryValue> {
     const source = qs.parse(str, {
         comma: true,
         allowDots: true,
@@ -188,14 +193,21 @@ function decodeQueryString(str: string, noCoerce = false): Record<string, QueryV
         strictNullHandling: true,
     })
 
-    if (noCoerce) {
+    if (noCoerce === true) {
         return source as Record<string, QueryValue>
     }
 
-    // deno-lint-ignore no-explicit-any
-    return (function toClosestType(value: string | Record<string, unknown> | any[]): any {
+    const noCoercePaths: string[] | null = Array.isArray(noCoerce) ? noCoerce : null
+    return (function toClosestType(
+        // deno-lint-ignore no-explicit-any
+        value: string | Record<string, unknown> | any[],
+        path: string
+        // deno-lint-ignore no-explicit-any
+    ): any {
         if (typeof value === "string") {
-            if (value === "true") {
+            if (noCoercePaths?.includes(path)) {
+                return value
+            } else if (value === "true") {
                 return true
             } else if (value === "false") {
                 return false
@@ -209,14 +221,19 @@ function decodeQueryString(str: string, noCoerce = false): Record<string, QueryV
                 return value
             }
         } else if (Array.isArray(value)) {
-            return value.map(toClosestType)
+            return value.map(
+                (val, index) => toClosestType(val, path ? `${path}.${index}` : String(index))
+            )
         } else if (isPlainObject(value)) {
             return Object.fromEntries(
-                // deno-lint-ignore no-explicit-any
-                Object.entries(value).map(([key, val]) => [key, toClosestType(val as any)])
+                Object.entries(value).map(([key, val]) => [
+                    key,
+                    // deno-lint-ignore no-explicit-any
+                    toClosestType(val as any, path ? `${path}.${key}` : key)
+                ])
             )
         } else {
             return value
         }
-    })(source) as Record<string, QueryValue>
+    })(source, "") as Record<string, QueryValue>
 }
