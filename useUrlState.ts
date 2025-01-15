@@ -23,10 +23,10 @@ export type QueryArray<T extends Scalar = Scalar> = QueryValue<T>[]
  * `noCoerce` option to instruct the program not to coerce specific paths, or
  * set the option to `true` to disable coercion entirely.
  * 
- * TIP: By default, like `useState`, the `setState` function will not update
+ * TIP: By default, like `useState`, the `setState` function will update
  * the state if the incoming state is not equal to the current state (using
  * shallow comparison `===`). But sometimes we would want to update the state
- * even if the incoming state is not deeply equal to the current state,
+ * only if the incoming state is not deeply equal to the current state,
  * especially when we use the state as a dependency in a `useEffect` hook. In
  * this case, we can set the `deepCompare` option to `true` to enable deep
  * comparison. If the new state is deeply equal to the current state, the state
