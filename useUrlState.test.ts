@@ -54,6 +54,19 @@ describe("useUrlState", () => {
             },
         })
         expect(location.search).toBe("?foo=baz&num=456&bool=false&nil&obj.hello=ayonli")
+
+        act(() => setState(prev => ({ ...prev, num: 789 })));
+        [state, setState] = result.current
+        expect(state).toStrictEqual({
+            foo: "baz",
+            num: 789,
+            bool: false,
+            nil: null,
+            obj: {
+                hello: "ayonli",
+            },
+        })
+        expect(location.search).toBe("?foo=baz&num=789&bool=false&nil&obj.hello=ayonli")
     })
 
     test("callback as initials", () => {

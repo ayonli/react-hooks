@@ -85,7 +85,7 @@ function useUrlState<T extends {
     deepCompare?: boolean
     noCoerce?: true | string[]
 } | undefined = undefined): readonly [T, Dispatch<SetStateAction<T>>] {
-    const [search, setSearch] = useState(location.search)
+    const [cache, setCache] = useState(location.search)
     const [state, _setState] = useState(() => {
         let state: T
         const hash = location.hash && location.hash !== "#"
@@ -110,6 +110,10 @@ function useUrlState<T extends {
             newState = newState(state)
         }
 
+        if (options?.deepCompare && equals(newState, state)) {
+            return
+        }
+
         const search = encodeQueryString(omit(newState, ["#"]), true)
         let path = location.pathname + search
 
@@ -117,14 +121,10 @@ function useUrlState<T extends {
             path += "#" + newState["#"]
         }
 
-        if (options?.deepCompare && equals(newState, state)) {
-            return
-        }
-
         globalThis.history.replaceState(null, "", path)
         _setState(newState)
-        setSearch(search)
-    }), [_setState, state])
+        setCache(search)
+    }), [_setState, state, options?.deepCompare ?? false])
 
     useEffect(() => {
         if (Object.keys(state).length !== 0) {
@@ -137,13 +137,14 @@ function useUrlState<T extends {
             }
 
             globalThis.history.replaceState(null, "", path)
+            setCache(search)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
-        if (location.search !== search) {
-            // sync initial state from URL
+        if (location.search !== cache) {
+            // In case the URL is modified elsewhere, sync state from URL
             const _state = decodeQueryString(location.search, options?.noCoerce) as T
             const hash = location.hash && location.hash !== "#"
                 ? location.hash.slice(1)
