@@ -9,6 +9,11 @@ import useRouter, {
     type ReplaceOptions,
 } from "./useRouter.ts"
 import useSubmit, { type SubmitState } from "./useSubmit.ts"
+import useStorageState, {
+    type JSONValue,
+    type JSONArray,
+    type JSONObject,
+} from "./useStorageStage.ts"
 import useUrlState, {
     type Scalar,
     type QueryValue,
@@ -24,6 +29,9 @@ export type {
     ReplaceOptions,
     SubmitState,
     Scalar,
+    JSONValue,
+    JSONArray,
+    JSONObject,
     QueryArray,
     QueryObject,
     QueryValue,
@@ -37,5 +45,6 @@ export {
     useRevertibleState,
     useRouter,
     useSubmit,
+    useStorageState,
     useUrlState,
 }
