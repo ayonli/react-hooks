@@ -79,6 +79,19 @@ describe("useStorageState", () => {
         expect(localStorage.getItem("foo")).toBe('{"foo":"baz"}')
     })
 
+    test("null as initials", () => {
+        const { result } = renderHook(() => useStorageState<{ foo: string } | null>("foo", null))
+        let [state, setState] = result.current
+
+        expect(state).toStrictEqual(null)
+        expect(localStorage.getItem("foo")).toBe(null)
+
+        act(() => setState({ foo: "baz" }));
+        [state, setState] = result.current
+        expect(state).toStrictEqual({ foo: "baz" })
+        expect(localStorage.getItem("foo")).toBe('{"foo":"baz"}')
+    })
+
     test("load from storage", () => {
         act(() => localStorage.setItem("foo", '{"foo":"baz"}'))
 
