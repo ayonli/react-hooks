@@ -22,5 +22,8 @@ the future.
   route and retrieving route parameters.
 - [useSubmit](https://jsr.io/@ayonli/react-hooks/doc/~/useSubmit) Submit data to
   a remote server and track the status of the request.
+- [useStorageState](https://jsr.io/@ayonli/react-hooks/doc/~/useStorageState)
+  Similar to `useState`, but persist the state to the `localStorage` (by default)
+  or `sessionStorage`.
 - [useUrlState](https://jsr.io/@ayonli/react-hooks/doc/~/useUrlState) Similar to
   `useState`, but persist the state to the URL query parameters.
