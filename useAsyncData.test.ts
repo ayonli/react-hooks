@@ -125,7 +125,7 @@ describe("useAsyncData", () => {
         const { result, rerender } = renderHook(({ deps }) => useAsyncData(async () => {
             return await Promise.resolve(deps)
         }, deps, (num) => num >= 2), { initialProps: { deps: [1] as [number] } })
-        expect(result.current.loading).toBe(false)
+        expect(result.current.loading).toBe(true)
         expect(result.current.data).toBe(undefined)
         expect(result.current.error).toBe(undefined)
 

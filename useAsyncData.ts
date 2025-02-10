@@ -84,7 +84,7 @@ export default function useAsyncData<T, D extends unknown[] = [], E extends unkn
     shouldRequest: ((...deps: D) => boolean) | undefined = undefined
 ): AsyncDataState<T, E> {
     const [state, setState] = useState({
-        loading: false,
+        loading: true,
         data: undefined as T | undefined,
         error: undefined as E | undefined,
         abort: (reason: E | undefined = undefined) => void reason as void,
